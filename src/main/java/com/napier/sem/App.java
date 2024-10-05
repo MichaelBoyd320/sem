@@ -4,6 +4,22 @@ import java.sql.*;
 
 public class App
 {
+    public static void main(String[] args)
+    {
+        // Create new Application
+        App a = new App();
+
+        // Connect to database
+        a.connect();
+        // Get Employee
+        Employee emp = a.getEmployee(255530);
+        // Display results
+        a.displayEmployee(emp);
+
+        // Disconnect from database
+        a.disconnect();
+    }
+
     private Connection con = null;
 
     /**
@@ -35,7 +51,7 @@ public class App
                 Thread.sleep(30000);
                 // Connect to database
                 con = DriverManager.getConnection("jdbc:mysql://db:3306/employees?useSSL=false", "root", "example");
-                System.out.println("Successfully connected");
+                System.out.println("Successfully connected aaaaa");
                 break;
             }
             catch (SQLException sqle)
@@ -63,17 +79,7 @@ public class App
             }
         }
     }
-    public static void main(String[] args)
-    {
-        // Create new Application
-        App a = new App();
 
-        // Connect to database
-        a.connect();
-
-        // Disconnect from database
-        a.disconnect();
-    }
     public Employee getEmployee(int ID)
     {
         try
@@ -81,10 +87,23 @@ public class App
             // Create an SQL statement
             Statement stmt = con.createStatement();
             // Create string for SQL statement
+
+            // employee has emp no
+            // title has emp no
+            // salaries has emp no
+            // dept_emp has emp no and dept no
+            // dept has dept no
+            // dept_manager has managerIds and dept no
+
+            // to get dept name for employee, we need to select dept_name where d.dept_no = de.dept_no AND de.emp_no = e.emp_no
+            // and to get the name of the manager, we need to
             String strSelect =
-                    "SELECT emp_no, first_name, last_name "
-                            + "FROM employees "
-                            + "WHERE emp_no = " + ID;
+                    "SELECT e.emp_no, e.first_name, e.last_name, titles.title, salaries.salary, departments.dept_name, m.first_name AS 'manager_name'"
+                            + "FROM employees e, titles, salaries, departments, dept_emp, dept_manager "
+                            + "JOIN employees m ON m.emp_no = dept_manager.emp_no "
+                            + "WHERE e.emp_no = " + ID + " AND titles.emp_no = e.emp_no AND salaries.emp_no = e.emp_no "
+                            + "AND dept_emp.emp_no = e.emp_no AND departments.dept_no = dept_emp.dept_no "
+                            + "AND dept_manager.dept_no = departments.dept_no ";
             // Execute SQL statement
             ResultSet rset = stmt.executeQuery(strSelect);
             // Return new employee if valid.
@@ -95,6 +114,11 @@ public class App
                 emp.emp_no = rset.getInt("emp_no");
                 emp.first_name = rset.getString("first_name");
                 emp.last_name = rset.getString("last_name");
+                emp.title = rset.getString("title");
+                emp.salary = rset.getInt("salary");
+                emp.dept_name = rset.getString("dept_name");
+                emp.manager = rset.getString("manager_name");
+
                 return emp;
             }
             else
@@ -105,6 +129,20 @@ public class App
             System.out.println(e.getMessage());
             System.out.println("Failed to get employee details");
             return null;
+        }
+    }
+    public void displayEmployee(Employee emp)
+    {
+        if (emp != null)
+        {
+            System.out.println(
+                    emp.emp_no + " "
+                            + emp.first_name + " "
+                            + emp.last_name + "\n"
+                            + emp.title + "\n"
+                            + "Salary:" + emp.salary + "\n"
+                            + emp.dept_name + "\n"
+                            + "Manager: " + emp.manager + "\n");
         }
     }
 }
