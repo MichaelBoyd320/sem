@@ -1,4 +1,4 @@
-# USE CASE: 3 Produce a Report on the Salary of Employees of a Given Role
+# USE CASE: 3 Produce a Report on the Salary of Employees in a given Department
 
 ## CHARACTERISTIC INFORMATION
 
