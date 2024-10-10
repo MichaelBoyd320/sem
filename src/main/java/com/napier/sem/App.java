@@ -12,9 +12,11 @@ public class App
         // Connect to database
         a.connect();
         // Get Employee
-        Employee emp = a.getEmployee(255530);
+        // Employee emp = a.getEmployee(255530);
+        Employee[] emps = a.getEmployeesRole("Engineer");
+
         // Display results
-        a.displayEmployee(emp);
+        a.displayEmployees(emps);
 
         // Disconnect from database
         a.disconnect();
@@ -131,6 +133,61 @@ public class App
             return null;
         }
     }
+    public Employee[] getEmployeesRole(String Role)
+    {
+        try
+        {
+            // Create an SQL statement
+            Statement stmt = con.createStatement();
+            // Create string for SQL statement
+
+            // employee has emp no
+            // title has emp no
+            // salaries has emp no
+            // dept_emp has emp no and dept no
+            // dept has dept no
+            // dept_manager has managerIds and dept no
+
+            // to get dept name for employee, we need to select dept_name where d.dept_no = de.dept_no AND de.emp_no = e.emp_no
+            // and to get the name of the manager, we need to
+            String strSelect =
+                    "SELECT count(*) AS 'C', employees.emp_no, employees.first_name, employees.last_name, salaries.salary "
+                            + "FROM employees, salaries, titles "
+                            + "WHERE employees.emp_no = salaries.emp_no "
+                            + "AND employees.emp_no = titles.emp_no "
+                            + "AND salaries.to_date = '9999-01-01' AND titles.to_date = '9999-01-01'"
+                            + "AND titles.title = '" + Role + "' "
+                            + "ORDER BY employees.emp_no ASC";
+            // Execute SQL statement
+            ResultSet rset = stmt.executeQuery(strSelect);
+            // Return new employee if valid.
+            // Check one is returned
+            Employee[] employees = new Employee[rset.getInt("C")];
+            int count = 0;
+            while (rset.next())
+            {
+                employees[count] = new Employee();
+                employees[count].emp_no = rset.getInt("emp_no");
+                employees[count].first_name = rset.getString("first_name");
+                employees[count].last_name = rset.getString("last_name");
+                employees[count].title = rset.getString("title");
+                employees[count].salary = rset.getInt("salary");
+                employees[count].dept_name = rset.getString("dept_name");
+                employees[count].manager = rset.getString("manager_name");
+
+            }
+
+            return employees;
+
+
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            System.out.println("Failed to get employee details");
+            return null;
+        }
+    }
     public void displayEmployee(Employee emp)
     {
         if (emp != null)
@@ -143,6 +200,22 @@ public class App
                             + "Salary:" + emp.salary + "\n"
                             + emp.dept_name + "\n"
                             + "Manager: " + emp.manager + "\n");
+        }
+    }
+    public void displayEmployees(Employee[] emps)
+    {
+        if (emps != null)
+        {
+            for(int i = 0; i < emps.length; ++i) {
+                System.out.println(
+                        emps[i].emp_no + " "
+                                + emps[i].first_name + " "
+                                + emps[i].last_name + "\n"
+                                + emps[i].title + "\n"
+                                + "Salary:" + emps[i].salary + "\n"
+                                + emps[i].dept_name + "\n"
+                                + "Manager: " + emps[i].manager + "\n");
+            }
         }
     }
 }
