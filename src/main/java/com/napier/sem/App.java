@@ -1,6 +1,7 @@
 package com.napier.sem;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class App
 {
@@ -11,9 +12,12 @@ public class App
 
         // Connect to database
         a.connect();
-        // Get Employee
+        // Get a single Employee
         // Employee emp = a.getEmployee(255530);
-        Employee[] emps = a.getEmployeesRole("Engineer");
+        // get employees based on role
+        //ArrayList<Employee> emps = a.getEmployeesRole("Engineer");
+        // get all employees
+        ArrayList<Employee> emps = a.getAllSalaries();
 
         // Display results
         a.displayEmployees(emps);
@@ -133,25 +137,15 @@ public class App
             return null;
         }
     }
-    public Employee[] getEmployeesRole(String Role)
+    public ArrayList<Employee> getEmployeesRole(String Role)
     {
         try
         {
             // Create an SQL statement
             Statement stmt = con.createStatement();
-            Statement stmta = con.createStatement();
 
             // Create string for SQL statement
 
-
-            String strSelectCount =
-                    "SELECT count(*) AS 'C' "
-                            + "FROM employees, salaries, titles "
-                            + "WHERE employees.emp_no = salaries.emp_no "
-                            + "AND employees.emp_no = titles.emp_no "
-                            + "AND salaries.to_date = '9999-01-01' AND titles.to_date = '9999-01-01'"
-                            + "AND titles.title = '" + Role + "' "
-                            + "ORDER BY employees.emp_no ASC";
 
             // to get dept name for employee, we need to select dept_name where d.dept_no = de.dept_no AND de.emp_no = e.emp_no
             // and to get the name of the manager, we need to
@@ -164,31 +158,24 @@ public class App
                             + "AND titles.title = '" + Role + "' "
                             + "ORDER BY employees.emp_no ASC";
 
-            int EmpCount = 0;
-            ResultSet rseta = stmta.executeQuery(strSelectCount);
-
-            while (rseta.next())
-            {
-                System.out.println("there are " + rseta.getInt(1) + " " + Role + "s.");
-                EmpCount = rseta.getInt(1);
-            }
             // Execute SQL statement
 
 
             ResultSet rset = stmt.executeQuery(strSelect);
             // Return new employee if valid.
             // Check one is returned
-            Employee[] employees = new Employee[EmpCount];
+            ArrayList<Employee> employees = new ArrayList<Employee>();
+
             int count = 0;
             while (rset.next())
             {
-                employees[count] = new Employee();
-                employees[count].emp_no = rset.getInt("emp_no");
-                employees[count].first_name = rset.getString("first_name");
-                employees[count].last_name = rset.getString("last_name");
-                employees[count].title = rset.getString("title");
-                employees[count].salary = rset.getInt("salary");
-                count++;
+                Employee emp = new Employee();
+                emp.emp_no = rset.getInt("emp_no");
+                emp.first_name = rset.getString("first_name");
+                emp.last_name = rset.getString("last_name");
+                emp.title = rset.getString("title");
+                emp.salary = rset.getInt("salary");
+                employees.add(emp);
             }
 
             return employees;
@@ -216,19 +203,53 @@ public class App
                             + "Manager: " + emp.manager + "\n");
         }
     }
-    public void displayEmployees(Employee[] emps)
+
+    public ArrayList<Employee> getAllSalaries()
     {
-        if (emps != null)
+        try
         {
-            for(int i = 0; i < emps.length; ++i)
+            // Create an SQL statement
+            Statement stmt = con.createStatement();
+            // Create string for SQL statement
+            String strSelect =
+                    "SELECT employees.emp_no, employees.first_name, employees.last_name, salaries.salary "
+                            + "FROM employees, salaries "
+                            + "WHERE employees.emp_no = salaries.emp_no AND salaries.to_date = '9999-01-01' "
+                            + "ORDER BY employees.emp_no ASC";
+            // Execute SQL statement
+            ResultSet rset = stmt.executeQuery(strSelect);
+            // Extract employee information
+            ArrayList<Employee> employees = new ArrayList<Employee>();
+            while (rset.next())
             {
-                System.out.println(
-                        emps[i].emp_no + "\t"
-                                + emps[i].first_name + "\t"
-                                + emps[i].last_name + "\t"
-                                + emps[i].title + "\t "
-                                + "Salary:" + emps[i].salary);
+                Employee emp = new Employee();
+                emp.emp_no = rset.getInt("employees.emp_no");
+                emp.first_name = rset.getString("employees.first_name");
+                emp.last_name = rset.getString("employees.last_name");
+                emp.salary = rset.getInt("salaries.salary");
+                employees.add(emp);
             }
+            return employees;
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            System.out.println("Failed to get salary details");
+            return null;
+        }
+    }
+
+    public void displayEmployees(ArrayList<Employee> emps)
+    {
+        // Print header
+        System.out.println(String.format("%-10s %-15s %-20s %-8s %-10s %-30s %-20s", "Emp No", "First Name", "Last Name", "Salary","Title","Manager","Department"));
+        // Loop over all employees in the list
+        for (Employee emp : emps)
+        {
+            String emp_string =
+                    String.format("%-10s %-15s %-20s %-8s",
+                            emp.emp_no, emp.first_name, emp.last_name, emp.salary, emp.title, emp.manager, emp. dept_name);
+            System.out.println(emp_string);
         }
     }
 }
