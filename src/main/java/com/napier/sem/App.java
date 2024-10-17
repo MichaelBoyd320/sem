@@ -139,30 +139,46 @@ public class App
         {
             // Create an SQL statement
             Statement stmt = con.createStatement();
+            Statement stmta = con.createStatement();
+
             // Create string for SQL statement
 
-            // employee has emp no
-            // title has emp no
-            // salaries has emp no
-            // dept_emp has emp no and dept no
-            // dept has dept no
-            // dept_manager has managerIds and dept no
 
-            // to get dept name for employee, we need to select dept_name where d.dept_no = de.dept_no AND de.emp_no = e.emp_no
-            // and to get the name of the manager, we need to
-            String strSelect =
-                    "SELECT count(*) AS 'C', employees.emp_no, employees.first_name, employees.last_name, salaries.salary "
+            String strSelectCount =
+                    "SELECT count(*) AS 'C' "
                             + "FROM employees, salaries, titles "
                             + "WHERE employees.emp_no = salaries.emp_no "
                             + "AND employees.emp_no = titles.emp_no "
                             + "AND salaries.to_date = '9999-01-01' AND titles.to_date = '9999-01-01'"
                             + "AND titles.title = '" + Role + "' "
                             + "ORDER BY employees.emp_no ASC";
+
+            // to get dept name for employee, we need to select dept_name where d.dept_no = de.dept_no AND de.emp_no = e.emp_no
+            // and to get the name of the manager, we need to
+            String strSelect =
+                    "SELECT employees.emp_no, employees.first_name, employees.last_name, titles.title, salaries.salary "
+                            + "FROM employees, salaries, titles "
+                            + "WHERE employees.emp_no = salaries.emp_no "
+                            + "AND employees.emp_no = titles.emp_no "
+                            + "AND salaries.to_date = '9999-01-01' AND titles.to_date = '9999-01-01'"
+                            + "AND titles.title = '" + Role + "' "
+                            + "ORDER BY employees.emp_no ASC";
+
+            int EmpCount = 0;
+            ResultSet rseta = stmta.executeQuery(strSelectCount);
+
+            while (rseta.next())
+            {
+                System.out.println("there are " + rseta.getInt(1) + " " + Role + "s.");
+                EmpCount = rseta.getInt(1);
+            }
             // Execute SQL statement
+
+
             ResultSet rset = stmt.executeQuery(strSelect);
             // Return new employee if valid.
             // Check one is returned
-            Employee[] employees = new Employee[rset.getInt("C")];
+            Employee[] employees = new Employee[EmpCount];
             int count = 0;
             while (rset.next())
             {
@@ -172,9 +188,7 @@ public class App
                 employees[count].last_name = rset.getString("last_name");
                 employees[count].title = rset.getString("title");
                 employees[count].salary = rset.getInt("salary");
-                employees[count].dept_name = rset.getString("dept_name");
-                employees[count].manager = rset.getString("manager_name");
-
+                count++;
             }
 
             return employees;
@@ -206,15 +220,14 @@ public class App
     {
         if (emps != null)
         {
-            for(int i = 0; i < emps.length; ++i) {
+            for(int i = 0; i < emps.length; ++i)
+            {
                 System.out.println(
-                        emps[i].emp_no + " "
-                                + emps[i].first_name + " "
-                                + emps[i].last_name + "\n"
-                                + emps[i].title + "\n"
-                                + "Salary:" + emps[i].salary + "\n"
-                                + emps[i].dept_name + "\n"
-                                + "Manager: " + emps[i].manager + "\n");
+                        emps[i].emp_no + "\t"
+                                + emps[i].first_name + "\t"
+                                + emps[i].last_name + "\t"
+                                + emps[i].title + "\t "
+                                + "Salary:" + emps[i].salary);
             }
         }
     }
