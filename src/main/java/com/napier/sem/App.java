@@ -232,7 +232,7 @@ public class App {
     public Department getDepartment(String dept)
     {
         // get the details of a specific department based on just the name
-
+//
         Department department = new Department();
         department.dept_no = "";
         department.dept_name = dept;
