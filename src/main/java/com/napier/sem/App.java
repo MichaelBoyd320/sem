@@ -249,22 +249,42 @@ public class App {
         }
     }
 
-    public void displayEmployees(ArrayList<Employee> emps) {
+    public void displayEmployees(ArrayList<Employee> emps)
+    {
+
+        // Check employees is not null
+        if (emps == null)
+        {
+            System.out.println("No employees");
+            return;
+        }
+
         // Print header
         System.out.println(String.format("%-10s %-15s %-20s %-8s %-10s %-30s %-20s", "Emp No", "First Name", "Last Name", "Salary", "Title", "Manager", "Department"));
         // Loop over all employees in the list
-        for (Employee emp : emps) {
-            String emp_string =
-                    String.format("%-10s %-15s %-20s %-8s",
-                            emp.emp_no, emp.first_name, emp.last_name, emp.salary, emp.title, emp.manager, emp.dept.dept_name);
-            System.out.println(emp_string);
+        for (Employee emp : emps)
+        {
+            if (emp == null)
+                continue;
+            if(emp.dept != null) {
+                String emp_string =
+                        String.format("%-10s %-15s %-20s %-8s",
+                                emp.emp_no, emp.first_name, emp.last_name, emp.salary, emp.title, emp.manager, emp.dept.dept_name);
+                System.out.println(emp_string);
+            }
+            else
+            {
+                String emp_string =
+                        String.format("%-10s %-15s %-20s",
+                                emp.emp_no, emp.first_name, emp.last_name, emp.salary, emp.title, emp.manager);
+                System.out.println(emp_string);
+            }
+
+
         }
     }
 
-   // public ArrayList<Employee> getSalariesByDepartment(Department dept)
-  //  {
-        // get an array list of all employees
-  //  }
+
 
     public Department getDepartment(String dept)
     {
