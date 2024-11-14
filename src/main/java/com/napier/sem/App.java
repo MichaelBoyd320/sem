@@ -172,7 +172,7 @@ public class App {
         }
     }
 
-    static public void displayEmployee(Employee emp) {
+    public void displayEmployee(Employee emp) {
         if (emp != null) {
             System.out.println(
                     emp.emp_no + " "

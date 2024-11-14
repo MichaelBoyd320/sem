@@ -68,5 +68,9 @@ public class AppTest
         employees.add(emp);
         app.displayEmployees(employees);
     }
-
+    @Test
+    void DisplayEmployeeNull()
+    {
+        app.displayEmployee
+    }
 }
