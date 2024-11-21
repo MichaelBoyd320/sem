@@ -71,6 +71,7 @@ public class AppTest
     @Test
     void DisplayEmployeeNull()
     {
-        app.displayEmployee
+        Employee emp = new Employee();
+        app.displayEmployee(emp);
     }
 }
